@@ -1,0 +1,358 @@
+// app/hod/profile/page.tsx
+
+'use client';
+
+import React, { useState } from 'react';
+import { HODLayout } from '@/app/layout/HodLayout';
+import {
+  Save,
+  Key,
+  Mail,
+  Phone,
+  Building,
+  Shield,
+  Globe,
+  UserCircle,
+  Settings,
+  Lock,
+  AlertCircle,
+  CheckCircle,
+  LogOut as LogOutIcon,
+} from 'lucide-react';
+
+// ========== TYPE DEFINITIONS ==========
+interface ProfileFormData {
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+// ========== MAIN COMPONENT ==========
+const HODProfilePage: React.FC = () => {
+  const [showSuccessBanner, setShowSuccessBanner] = useState<boolean>(false);
+  const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
+  
+  // ========== FORM STATE ==========
+  const [formData, setFormData] = useState<ProfileFormData>({
+    fullName: 'Dr. Sarah Taylor',
+    email: 's.taylor@mendocompany.com',
+    phoneNumber: '+1 (555) 123-4567',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  // ========== HELPER FUNCTIONS ==========
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveChanges = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowSuccessBanner(true);
+    setTimeout(() => {
+      setShowSuccessBanner(false);
+    }, 5000);
+    console.log('Profile updated:', formData);
+  };
+
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    setShowLogoutModal(false);
+    window.location.href = '/login';
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
+  };
+
+  // ========== RENDER ==========
+  return (
+    <HODLayout
+      pageTitle="My Profile & Administrative Settings"
+      pageSubtitle="Manage your personal credentials and department administration settings"
+      showCreateButton={false}
+    >
+      {/* Success Banner */}
+      {showSuccessBanner && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3 animate-fade-in">
+          <CheckCircle size={20} className="text-green-600" />
+          <span className="text-green-800 font-medium">Profile updated successfully!</span>
+        </div>
+      )}
+
+      <div className="space-y-6">
+        {/* ===== HOD PERSONAL PROFILE & CREDENTIALS ===== */}
+        <section className="bg-white rounded-xl border border-[#E5E7EB] p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <UserCircle size={24} className="text-[#263A81]" />
+            <h2 className="text-xl font-bold text-[#1F2937]">Personal Credentials</h2>
+          </div>
+
+          <form onSubmit={handleSaveChanges} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="fullName" className="block text-sm font-medium text-[#1F2937] mb-1">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  className="w-full h-12 px-4 rounded-lg border border-[#D1D5DB] bg-white text-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#263A81] focus:border-transparent transition"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-[#1F2937] mb-1">
+                  Corporate Email <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <Mail size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6B7280]" />
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full h-12 pl-10 pr-4 rounded-lg border border-[#D1D5DB] bg-white text-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#263A81] focus:border-transparent transition"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="phoneNumber" className="block text-sm font-medium text-[#1F2937] mb-1">
+                Contact Number
+              </label>
+              <div className="relative">
+                <Phone size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6B7280]" />
+                <input
+                  type="tel"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleInputChange}
+                  className="w-full h-12 pl-10 pr-4 rounded-lg border border-[#D1D5DB] bg-white text-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#263A81] focus:border-transparent transition"
+                />
+              </div>
+            </div>
+
+            {/* Password Update Section */}
+            <div className="pt-4 border-t border-[#E5E7EB]">
+              <div className="flex items-center gap-3 mb-4">
+                <Lock size={20} className="text-[#263A81]" />
+                <h3 className="text-base font-semibold text-[#1F2937]">Security Account Password</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label htmlFor="currentPassword" className="block text-sm font-medium text-[#1F2937] mb-1">
+                    Current Password
+                  </label>
+                  <input
+                    type="password"
+                    id="currentPassword"
+                    name="currentPassword"
+                    value={formData.currentPassword}
+                    onChange={handleInputChange}
+                    placeholder="Enter current password"
+                    className="w-full h-12 px-4 rounded-lg border border-[#D1D5DB] bg-white text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#263A81] focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="newPassword" className="block text-sm font-medium text-[#1F2937] mb-1">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    id="newPassword"
+                    name="newPassword"
+                    value={formData.newPassword}
+                    onChange={handleInputChange}
+                    placeholder="Enter new password"
+                    className="w-full h-12 px-4 rounded-lg border border-[#D1D5DB] bg-white text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#263A81] focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#1F2937] mb-1">
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    placeholder="Confirm new password"
+                    className="w-full h-12 px-4 rounded-lg border border-[#D1D5DB] bg-white text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#263A81] focus:border-transparent transition"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-[#E5E7EB]">
+              <button
+                type="submit"
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-[#263A81] text-white font-bold rounded-lg hover:bg-[#1e2f6a] transition-all duration-200 active:scale-95 shadow-lg shadow-[#263A81]/20 w-full md:w-auto"
+              >
+                <Save size={20} />
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </section>
+
+        {/* ===== DEPARTMENT METADATA PANEL ===== */}
+        <section className="bg-white rounded-xl border border-[#E5E7EB] p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <Building size={24} className="text-[#263A81]" />
+            <h2 className="text-xl font-bold text-[#1F2937]">Department Metadata</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+                  Department Name
+                </label>
+                <p className="text-[#1F2937] font-medium mt-1 flex items-center gap-2">
+                  <Building size={16} className="text-[#263A81]" />
+                  IT Architecture
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+                  Managed Unit ID
+                </label>
+                <p className="text-[#1F2937] font-medium mt-1 flex items-center gap-2">
+                  <Shield size={16} className="text-[#263A81]" />
+                  DEPT-ITA-2026
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+                  Structural Level
+                </label>
+                <p className="text-[#1F2937] font-medium mt-1 flex items-center gap-2">
+                  <Globe size={16} className="text-[#263A81]" />
+                  Senior Department Management
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#6B7280] uppercase tracking-wider">
+                  Scope of Authority
+                </label>
+                <div className="mt-1 p-3 bg-[#FEFEFC] border border-[#E5E7EB] rounded-lg">
+                  <p className="text-sm text-[#1F2937]">
+                    Authorized for Personnel Offboarding, Task CRUD, and Task Allocation within IT Architecture.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== SESSION MANAGEMENT ===== */}
+        <section className="bg-white rounded-xl border border-[#E5E7EB] p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <Settings size={24} className="text-[#263A81]" />
+            <h2 className="text-xl font-bold text-[#1F2937]">Session Management</h2>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 bg-red-50/50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-red-100 rounded-lg">
+                <LogOutIcon size={20} className="text-red-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-[#1F2937]">End Current Session</p>
+                <p className="text-sm text-[#6B7280]">Securely log out of your current session</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all duration-200 active:scale-95 w-full md:w-auto shadow-lg shadow-red-200"
+            >
+              <LogOutIcon size={20} />
+              Logout
+            </button>
+          </div>
+        </section>
+      </div>
+
+      {/* ===== LOGOUT CONFIRMATION MODAL ===== */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-xl max-w-md w-full shadow-2xl animate-scale-in">
+            <div className="p-6 border-b border-[#E5E7EB]">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <LogOutIcon size={24} className="text-red-600" />
+                </div>
+                <h2 className="text-xl font-bold text-[#1F2937]">Confirm Logout</h2>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <p className="text-[#1F2937] mb-2">
+                Are you sure you want to log out of your session?
+              </p>
+              <p className="text-sm text-[#6B7280]">
+                You will be redirected to the login page and will need to re-authenticate to access your dashboard.
+              </p>
+            </div>
+
+            <div className="flex gap-3 p-6 pt-0 border-t border-[#E5E7EB]">
+              <button
+                onClick={cancelLogout}
+                className="flex-1 px-4 py-3 rounded-lg border border-[#D1D5DB] text-[#1F2937] font-medium hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all duration-200 active:scale-95"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { transform: scale(0.9); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        .animate-fade-in { animation: fadeIn 0.2s ease-out; }
+        .animate-scale-in { animation: scaleIn 0.2s ease-out; }
+      `}</style>
+    </HODLayout>
+  );
+};
+
+export default HODProfilePage;
