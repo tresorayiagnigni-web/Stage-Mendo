@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Put, Delete, Param, Request, UseGuards, Patch, Body} from '@nestjs/common';
+import {Controller, Get, Post, Put, Delete, Param, Request, UseGuards, Patch, Body, ParseIntPipe} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update.user.dto';
@@ -8,6 +8,7 @@ import { Roles } from './decorators copy/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from './enums/role.enum';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RegisterDto } from 'src/auth/dto/register.dto';
 
 
 
@@ -23,10 +24,30 @@ export class UsersController {
 
   //cree un user
 
-  @Post()
-  create(@Body() CreateUserDto: CreateUserDto){
-   return this.usersService.create(CreateUserDto) 
+  // Seul l'admin peut créer des membres
+  @Post('users')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async createMember(@Body() dto: RegisterDto) {
+    const user = await this.usersService.create(
+      dto.email!,
+      dto.password!,
+      dto.role!,
+    );
+
+    // On ne renvoie jamais le mot de passe
+    const { password, ...result } = user;
+    return {
+      message: 'Membre créé avec succès',
+      user: result,
+    };
   }
+
+  
+  // @Post()
+  // create(@Body() CreateUserDto: CreateUserDto){
+  //  return this.usersService.create(CreateUserDto) 
+  // }
 
   //recuperer tuos les users
 
@@ -44,21 +65,27 @@ export class UsersController {
 
   //modifier un user
 
-  @Put(':id')
-   async update(
-    @Param('id') id: number,
-    @Body() updateUserDto: UpdateUserDto,   // ← Ajout important
+  // @Put(':id')
+  //  async update(
+  //   @Param('id') id: number,
+  //   @Body() updateUserDto: UpdateUserDto,   // ← Ajout important
     
-  ) {
-    return this.usersService.update(Number(id), updateUserDto);
-  }
+  // ) {
+  //   return this.usersService.update(Number(id), updateUserDto);
+  // }
 
   //supprimer un user avec son id
 
   @Delete(':id')
-  remove(@Param('id') id:number){
-    return this.usersService.remove(Number(id));
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.remove(id);
   }
+  // @Delete(':id')
+  // remove(@Param('id') id:number){
+  //   return this.usersService.remove(Number(id));
+  // }
 
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -68,6 +95,16 @@ export class UsersController {
     @Body() updateStatusDto: UpdateStatusDto,
   ) {
     return this.usersService.updateStatus(+id, updateStatusDto);
+  }
+
+  @Patch(':id')
+  @Roles(Role.ADMIN)                         // ← Seul l'ADMIN peut accéder
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  update(
+  @Param('id', ParseIntPipe) id: number,
+  @Body() updateUserDto: UpdateUserDto,
+  ) {
+  return this.usersService.update(id, updateUserDto);
   }
 
 }

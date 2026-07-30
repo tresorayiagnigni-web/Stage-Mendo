@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly userRepository: Repository<User>,
     private configService: ConfigService,
     private authService: AuthService,
-    private userService: UsersService,
+    private usersService: UsersService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -31,6 +31,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
+    
+    console.log('Payload :', payload);
     const userId = payload.sub;
 
     // 2. Recherche de l'utilisateur en BDD via l'ID extrait du token
@@ -38,7 +40,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       where: { id: userId },
     });
 
-    console.log(user);
+    console.log('User:',user );
 
     if (!user) {
       throw new UnauthorizedException('Utilisateur inexistant');
@@ -48,10 +50,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Compte inactif');
     }
 
-    return {
-      id: user.id,
-      email: user.email,
-      role: user.role,       // Important pour le RolesGuard
-    };
+    return user;
+
+    // return {
+    //   id: user.id,
+    //   email: user.email,
+    //   role: user.role,       // Important pour le RolesGuard
+    // };
   }
 }

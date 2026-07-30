@@ -1,4 +1,4 @@
-import { Controller, Query, Get, Post, Body, Put, Param, Delete, Request, Req, ParseIntPipe,UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Query, Get, Post, Body, Put, Patch, Param, Delete, Request, Req, ParseIntPipe,UsePipes, ValidationPipe } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -9,21 +9,33 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/users/entities/user.entity';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+
   @Post()
-  @Roles( Role.HOD, Role.ADMIN)
-  async create(@Body() createTaskDto: any, @Request() req) {
-    // req.user est maintenant défini grâce au Guard !
-    const userId = req.user.id; 
+  @Roles(Role.ADMIN, Role.HOD)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  create(
+  @Body() createTaskDto: CreateTaskDto,
+  @GetUser() currentUser: User,
+  ) {
+  return this.tasksService.create(createTaskDto, currentUser);
+}
+  // @UseGuards(AuthGuard('jwt'))
+  // @Post()
+  // @Roles( Role.HOD, Role.ADMIN)
+  // async createtasks(@Body() createTaskDto: any, @Request() req) {
+  //   // req.user est maintenant défini grâce au Guard !
+  //   const userId = req.user.id; 
     
-    return this.tasksService.create(createTaskDto, userId);
-  }
+  //   return this.tasksService.create(createTaskDto, userId);
+  // }
 
 
   @Get()
@@ -50,4 +62,15 @@ async findAll(@Query() filterDto: FilterTaskDto, @Req() req: any) {
   remove(@Param('id') id: number) {
     return this.tasksService.remove(+id);
   }
+
+//   @Patch(':id')
+//   @Roles(Role.ADMIN, Role.HOD)
+//   @UseGuards(JwtAuthGuard, RolesGuard)
+//   updatetasks(
+//   @Param('id', ParseIntPipe) id: number,
+//   @Body() updateTaskDto: UpdateTaskDto,
+//   @GetUser() currentUser: User,
+// ) {
+//   return this.tasksService.update(id, updateTaskDto, currentUser);
+// }
 }

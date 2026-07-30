@@ -13,26 +13,38 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 
 
+
 @Controller('auth')
 export class AuthController {
 
     constructor(private readonly authService: AuthService) {}
 
-    @Post('register')
-    async register(@Body() createUserdto: CreateUserDto) {
-        return this.authService.register(createUserdto);
-    }
 
-    @Post('login')
-    @HttpCode(HttpStatus.OK)
-    async login(@Body() logindto: LoginDto, @Headers('external-access-token') externalAccessToken: string,) {
-     return this.authService.login(logindto, externalAccessToken);
-    }
+    @Post('register')
+  register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
+
+  @Post('login')
+  login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
+  }
+
+    // @Post('register')
+    // async register(@Body() createUserdto: CreateUserDto) {
+    //     return this.authService.register(createUserdto);
+    // }
+
+    // @Post('login')
+    // @HttpCode(HttpStatus.OK)
+    // async login(@Body() logindto: LoginDto, @Headers('external-access-token') externalAccessToken: string,) {
+    //  return this.authService.login(logindto);
+    // }
 
 
     @Get('profile')
     @UseGuards(JwtAuthGuard)
-    @Roles(Role.EMPLOYER, Role.ADMIN)     // ← Ici
+    @Roles(Role.EMPLOYEE, Role.ADMIN)     // ← Ici
     getProfile(@GetUser() user) {
         return user;
     }

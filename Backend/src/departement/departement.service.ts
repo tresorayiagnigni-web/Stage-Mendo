@@ -69,7 +69,7 @@ export class DepartmentService {
 
   const user = await this.usersRepository.findOne({
     where: { 
-      id: dto.userId, 
+      nom: dto.nom, 
       status: true 
     }
   });
@@ -79,11 +79,15 @@ export class DepartmentService {
   }
 
   // === Mise à jour automatique du rôle ===
+  // Sauvegarder l'ancien rôle
+  const ancienRole = user.role;
+
+  // Modifier le rôle
   user.role = Role.HOD;   
   await this.usersRepository.save(user);                
 
   // Assigner le chef au département
-  departement.chef_departement = user.id?.toString(),
+  departement.chef_departement = user;
 
   // Sauvegarder les deux entités
   await this.usersRepository.save(user);           // ← Mise à jour du rôle
@@ -92,14 +96,13 @@ export class DepartmentService {
   return {
     message: `L'utilisateur ${user.nom || ''} a été nommé Chef de Département.`,
     details: {
-      ancienRole: user.role,
+      ancienRole,
       nouveauRole: user.role
     },
     departement: {
       id: departement.id,
       nom_departement: (departement as any).nom,
-      chef_departementId: user.id,
-      nom: `${user.nom || ''}`.trim(),
+      chef_departement: `${user.nom || ''}`.trim(),
     }
   }
   };

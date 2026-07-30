@@ -9,9 +9,9 @@ export class Departments {
     @Column({ unique: true })
     nom_departement?: string;
 
-    @OneToOne(() => User, user => user.departement, { onDelete: 'SET NULL' })
+    @OneToOne(() => User,{ nullable: true, onDelete: 'SET NULL' })
     @JoinColumn()
-    chef_departement?: string;
+    chef_departement?: User;
 
     @Column({ nullable: true })
     description?: string;

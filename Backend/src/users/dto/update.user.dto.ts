@@ -1,24 +1,30 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateUserDto } from './create-user.dto';
-import { IsOptional, IsString, IsEmail } from 'class-validator';
+import { IsOptional, IsString, IsEmail, IsEnum } from 'class-validator';
+import { Role } from '../../auth/enums/role.enum'; // adapte le chemin
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {
-    
-    @IsOptional()
-    @IsString()
-    nom?: string;
+export class UpdateUserDto {
+  @IsOptional()
+  @IsString()
+  nom?: string;
 
-    @IsOptional()
-    @IsString()
-    departement?: string;
+  @IsOptional()
+  @IsEmail()
+  email?: string;
 
-    @IsOptional()
-    @IsEmail()
-    email?: string;
+  @IsOptional()
+  @IsString()
+  password?: string;
 
-    @IsOptional()
-    @IsString()
-    telephone?: string;
+  @IsOptional()
+  @IsEnum(Role)
+  role?: Role;
 
-    // Ajoute d'autres champs selon tes besoins
+  @IsOptional()
+  @IsString()
+  departement?: string; // adapte selon le vrai nom du champ
+
+  @IsOptional()
+  @IsString()
+  status?: string; // si tu as un champ status
+
+  // Ajoute ici tous les autres champs que tu veux pouvoir modifier
 }

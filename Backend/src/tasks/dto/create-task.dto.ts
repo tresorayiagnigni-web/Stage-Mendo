@@ -5,7 +5,7 @@ import { TaskPriority } from '../enums/task-priority.enum';
 export class CreateTaskDto {
     @IsString()
     @IsNotEmpty()
-    titre?: string;
+    title?: string;
 
     @IsString()
     @IsOptional()
@@ -18,5 +18,9 @@ export class CreateTaskDto {
     @IsEnum(TaskPriority)
     @IsOptional()
     priorite?: TaskPriority;
+
+    @IsNotEmpty()
+    @IsString()
+    nom_employer?: string;
 
 }

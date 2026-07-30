@@ -10,7 +10,7 @@ export class Task {
     id?: number;
 
     @Column()
-    titre?: string;
+    title?: string;
 
     @Column({ nullable: true })
     description?: string;

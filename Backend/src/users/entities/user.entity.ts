@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany,ManyToOne, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, OneToMany,ManyToOne, UpdateDateColumn, CreateDateColumn } from 'typeorm';
 import { Role } from '../../auth/enums/role.enum';
 import { Task } from '../../tasks/entities/task.entity';
 import { Departments } from '../../departement/entities/departement.entity';
@@ -6,6 +6,11 @@ import { Token } from '../../auth/entities/token.entity';
 
 
 
+// export enum Role {
+//   ADMIN = 'ADMIN',
+//   HOD = 'HOD',
+//   EMPLOYEE = 'EMPLOYEE',
+// }
 @Entity('users')
 export class User {
 
@@ -36,16 +41,13 @@ export class User {
   @Column({ default: true })
   status?: boolean;
 
-  // @Column()
-  // externalAccessToken?: string;
-
-  // @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIME'})
-  // updateAt?: Date;
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIME'})
+  updateAt?: Date;
 
   @Column({
     type: 'enum',
     enum: Role,
-    default: Role.EMPLOYER,
+    default: Role.EMPLOYEE,
   })
   role?: Role;
 
@@ -54,5 +56,13 @@ export class User {
 
   // @OneToMany(() => Token, (token) => token.user)
   // tokens?: Token[];
+
+  // // Dans User entity
+  // @Column({ default: true })
+  // isActive?: boolean;
+
+  // Ou avec @DeleteDateColumn() de TypeORM
+  // @DeleteDateColumn()
+  // deletedAt?: Date;
 
 }

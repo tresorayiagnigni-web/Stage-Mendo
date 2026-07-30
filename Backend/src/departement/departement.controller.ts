@@ -8,6 +8,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { AssignChefDto } from './dto/assign-chef.dto';
+
 @Controller('departments')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
@@ -52,10 +53,10 @@ export class DepartmentController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles( Role.ADMIN)
   async assignchefDepartement(
-    @Param('id') departementId: string,
+    @Param('id', ParseIntPipe) departementId: number,
     @Body() dto: AssignChefDto,
   ) {
-    return this.departmentService.assignChef(+departementId, dto);
+    return this.departmentService.assignChef(departementId, dto);
   }
 
   @Delete(':id')

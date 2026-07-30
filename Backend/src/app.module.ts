@@ -10,6 +10,8 @@ import { TasksModule } from './tasks/tasks.module';
 import { AdminModule } from './admin/admin.module';
 import { DepartementModule } from './departement/departement.module';
 import { TokenController } from './auth/token.controller';
+import { ProjectsModule } from './project/project.module';
+import { User } from './users/entities/user.entity';
 
 
 @Module({
@@ -28,7 +30,7 @@ import { TokenController } from './auth/token.controller';
       }),
     }),
 
-    UsersModule, AuthModule, TasksModule, AdminModule, DepartementModule
+    UsersModule, AuthModule, TasksModule, AdminModule, DepartementModule, ProjectsModule
   
   ],
   controllers: [AppController, TokenController],

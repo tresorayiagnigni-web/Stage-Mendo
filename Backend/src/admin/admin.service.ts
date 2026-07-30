@@ -22,7 +22,7 @@ export class AdminService {
     return this.taskRepository.find({ relations: {user: true},
         select: {
             id: true,
-            titre: true,
+            title: true,
             description: true,
             status: true,
             priority: true,
