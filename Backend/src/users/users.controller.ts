@@ -33,6 +33,7 @@ export class UsersController {
       dto.email!,
       dto.password!,
       dto.role!,
+      dto.nom!,
     );
 
     // On ne renvoie jamais le mot de passe

@@ -63,7 +63,7 @@ export class UsersService {
   //   return this.findById(id);
   // }
 
-  async create(email: string, password: string, role: Role): Promise<User> {
+  async create(email: string, password: string, role: Role, nom: string): Promise<User> {
     const existing = await this.findByEmail(email);
     if (existing) {
       throw new ConflictException('Cet email est déjà utilisé');

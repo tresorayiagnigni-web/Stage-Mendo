@@ -41,6 +41,8 @@ export class AuthService {
       dto.email!,
       dto.password!,
       Role.ADMIN,
+      dto.nom!,
+
     );
 
     const token = this.generateToken(user);
