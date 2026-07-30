@@ -34,6 +34,8 @@ export class UsersController {
       dto.password!,
       dto.role!,
       dto.nom!,
+      dto.telephone!,
+      dto.departementId!,
     );
 
     // On ne renvoie jamais le mot de passe
@@ -52,9 +54,11 @@ export class UsersController {
 
   //recuperer tuos les users
 
-  @Get()
-  findAll(){
-    return this.usersService.findAll();
+  @Get('employees')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.HOD)
+  findEmployees(@Request() req) {
+    return this.usersService.findEmployees(req.user);
   }
 
   //recuperer un user avec son  id

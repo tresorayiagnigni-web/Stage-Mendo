@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update.user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -63,23 +63,54 @@ export class UsersService {
   //   return this.findById(id);
   // }
 
-  async create(email: string, password: string, role: Role, nom: string): Promise<User> {
+  async create(email: string, password: string, role: Role, nom: string, telephone: string, departementId: number): Promise<User> {
+    let departement: Departments | undefined = undefined;
+
+    const foundDepartment = await this.departmentRepository.findOne({
+      where: { id: departementId },
+    });
+
+    if (!foundDepartment) {
+      throw new NotFoundException("Département introuvable");
+    }
+
+    departement = foundDepartment;
+ 
     const existing = await this.findByEmail(email);
     if (existing) {
       throw new ConflictException('Cet email est déjà utilisé');
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    // const departement = departementId
+    // ? await this.departmentRepository.findOne({
+    //     where: { id: departementId },
+    //   })
+    // : undefined;
 
     const user = this.userRepository.create({
+      nom,
       email,
       password: hashedPassword,
+      telephone,
       role,
+      departement,
     });
-
-    return this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+    const result = await this.userRepository.findOne({
+      where: { id: savedUser.id },
+      relations: {
+        departement: true,
+      }  
+    });
+    if (!result) {
+    throw new Error('Utilisateur introuvable');
   }
 
+    return result;
+
+    
+  }
   async save(user: User): Promise<User> {
     return this.userRepository.save(user);
   }
@@ -140,10 +171,35 @@ export class UsersService {
 
   //Lire tous les donnees
 
-  findAll() {
+ async findEmployees(user: User) {
 
-    return this.userRepository.find();
+  // ADMIN : tous les employés
+  if (user.role === Role.ADMIN) {
+    return this.userRepository.find({
+      where: {
+        role: Role.EMPLOYEE,
+      },
+      relations: { departement: true, },
+    });
+  }
 
+  // HOD : uniquement les employés de son département
+  if (!user.departement) {
+    throw new BadRequestException("Utilisateur sans département");
+  }
+
+  return this.userRepository.find({
+    where: {
+      role: Role.EMPLOYEE,
+      departement: {
+        id: user.departement.id,
+      },
+    },
+    relations: {
+      departement: true,
+    },
+  });
+ 
   }
 
   //Lire un utilisateur par son ID
@@ -165,9 +221,9 @@ export class UsersService {
   }
 
   // Si le mot de passe est fourni, on le hash
-  if (updateUserDto.password) {
-    updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
-  }
+  // if (updateUserDto.password) {
+  //   updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+  // }
 
   // On fusionne les nouvelles valeurs
   Object.assign(user, updateUserDto);

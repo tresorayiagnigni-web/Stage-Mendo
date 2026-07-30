@@ -32,7 +32,7 @@ export class AuthService {
     // Après le premier utilisateur → inscription publique fermée
     if (userCount > 0) {
       throw new ForbiddenException(
-        'L\'inscription publique est fermée. Seul un administrateur peut créer des comptes.',
+        'L\'inscription publique est fermée. Seul un administrateur peut créer des comptes desormet.',
       );
     }
 
@@ -42,6 +42,8 @@ export class AuthService {
       dto.password!,
       Role.ADMIN,
       dto.nom!,
+      dto.telephone!,
+      dto.departementId!,
 
     );
 

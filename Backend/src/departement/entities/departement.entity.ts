@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, CreateDateColumn, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, CreateDateColumn, OneToMany, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity('departements')
@@ -15,6 +15,9 @@ export class Departments {
 
     @Column({ nullable: true })
     description?: string;
+
+    @OneToMany(() => User, (user) => user.departement)
+    users?: User[];
 
     @CreateDateColumn()
     date_creation?: Date;

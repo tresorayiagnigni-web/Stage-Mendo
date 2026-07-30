@@ -50,7 +50,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Compte inactif');
     }
 
-    return user;
+    
+    return this.userRepository.findOne({
+      where: {
+        id: payload.sub,
+      },
+      relations: { departement: true, },
+    });
+  
+
+    // return user;
 
     // return {
     //   id: user.id,

@@ -41,8 +41,8 @@ export class TasksService {
     // ADMIN peut assigner à n'importe quel employé → OK
   } 
   else if (currentUser.role === Role.HOD) {
-    const deptHOD = currentUser.departement?.trim().toLowerCase();
-  const deptEmployee = employee.departement?.trim().toLowerCase();
+    const deptHOD = currentUser.departement?.nom_departement;
+  const deptEmployee = employee.departement?.nom_departement;
 
   console.log('=== DEBUG ===');
   console.log('HOD     :', currentUser.departement);

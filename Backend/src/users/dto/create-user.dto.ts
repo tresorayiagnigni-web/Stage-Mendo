@@ -15,6 +15,7 @@ export class CreateUserDto {
   @IsString()
   password?: string;
 
+
   @IsNotEmpty()
   @IsString()
   departement?: string;

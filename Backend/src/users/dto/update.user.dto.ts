@@ -12,7 +12,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  password?: string;
+  telephone?: string;
 
   @IsOptional()
   @IsEnum(Role)
@@ -25,6 +25,10 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   status?: string; // si tu as un champ status
+
+  @IsOptional()
+  @IsString()
+  departementId?: string;
 
   // Ajoute ici tous les autres champs que tu veux pouvoir modifier
 }

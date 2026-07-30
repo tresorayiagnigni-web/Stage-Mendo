@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, OneToMany,ManyToOne, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, OneToMany,ManyToOne, JoinColumn, UpdateDateColumn, CreateDateColumn } from 'typeorm';
 import { Role } from '../../auth/enums/role.enum';
 import { Task } from '../../tasks/entities/task.entity';
 import { Departments } from '../../departement/entities/departement.entity';
@@ -26,8 +26,11 @@ export class User {
   @Column({ select: false })
   password?: string;
 
-  @Column()
-  departement?: string;
+  @ManyToOne(() => Departments, (department) => department.users, {
+    nullable: true,                     // ou false si le département est obligatoire
+  })
+  @JoinColumn({ name: 'departementId' })
+  departement?: Departments;
 
   @Column()
   telephone?: string;
