@@ -76,9 +76,9 @@ export class UsersService {
 
   //Lire tous les donnees
 
-  findAll() {
+  async findAll() {
 
-    return this.userRepository.find();
+    return await this.userRepository.find();
 
   }
 

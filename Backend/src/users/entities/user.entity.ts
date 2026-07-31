@@ -3,14 +3,12 @@ import { Role } from '../../auth/enums/role.enum';
 import { Task } from '../../tasks/entities/task.entity';
 import { Departments } from '../../departement/entities/departement.entity';
 import { Token } from '../../auth/entities/token.entity';
+import { BaseEntity } from 'src/auth/entities/baseEntity';
 
 
 
 @Entity('users')
-export class User {
-
-  @PrimaryGeneratedColumn()
-  id?: number;
+export class User extends BaseEntity {
 
   @Column()
   nom?: string;
@@ -27,11 +25,6 @@ export class User {
   @Column()
   telephone?: string;
 
-
-  @UpdateDateColumn({ type: 'timestamp' })  
-
-  @CreateDateColumn()
-  createdAt?: Date;
 
   @Column({ default: true })
   status?: boolean;

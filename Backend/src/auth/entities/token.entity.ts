@@ -1,10 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index, CreateDateColumn } from 'typeorm';
+import { BaseEntity } from './baseEntity';
 
 @Entity('tokens')
-export class Token {
-  @PrimaryGeneratedColumn()
-  id?: number;
-
+export class Token extends BaseEntity {
   @Column()
   @Index()
   userId?: number;
@@ -27,6 +25,5 @@ export class Token {
   })
   status?: boolean;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  cree_le?: Date;
+
 }

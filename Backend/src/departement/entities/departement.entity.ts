@@ -1,11 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, CreateDateColumn, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { BaseEntity } from 'src/auth/entities/baseEntity';
 
 @Entity('departements')
-export class Departments {
-    @PrimaryGeneratedColumn()
-    id?: number;
-
+export class Departments extends BaseEntity{
+   
     @Column({ unique: true })
     nom_departement?: string;
 
@@ -15,9 +14,6 @@ export class Departments {
 
     @Column({ nullable: true })
     description?: string;
-
-    @CreateDateColumn()
-    date_creation?: Date;
 
     // @OneToOne(() => User, user => user.department, { onDelete: 'SET NULL' })
     // @Column()

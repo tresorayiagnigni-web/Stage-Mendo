@@ -31,8 +31,8 @@ export class UsersController {
   //recuperer tuos les users
 
   @Get()
-  findAll(){
-    return this.usersService.findAll();
+  async findAll(){
+    return await this.usersService.findAll();
   }
 
   //recuperer un user avec son  id
