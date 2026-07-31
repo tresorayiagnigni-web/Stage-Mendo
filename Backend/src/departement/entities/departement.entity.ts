@@ -10,7 +10,7 @@ export class Departments {
     nom_departement?: string;
 
     @OneToOne(() => User,{ nullable: true, onDelete: 'SET NULL' })
-    @JoinColumn()
+    @JoinColumn({ name: 'chefDepartementId' })
     chef_departement?: User;
 
     @Column({ nullable: true })

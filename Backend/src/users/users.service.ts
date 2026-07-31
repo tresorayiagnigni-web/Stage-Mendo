@@ -66,13 +66,26 @@ export class UsersService {
   async create(email: string, password: string, role: Role, nom: string, telephone: string, departementId: number): Promise<User> {
     let departement: Departments | undefined = undefined;
 
+    // 1. Récupérer le département
     const foundDepartment = await this.departmentRepository.findOne({
       where: { id: departementId },
+      relations: { chef_departement: true,},
     });
+
+    if (!departementId) {
+      throw new BadRequestException('Un HOD doit obligatoirement avoir un département');
+    }
 
     if (!foundDepartment) {
       throw new NotFoundException("Département introuvable");
     }
+
+    // 2. Vérifier qu'il n'a pas déjà un chef
+  if (foundDepartment.chef_departement) {
+    throw new BadRequestException(
+      `Le département "${foundDepartment.nom_departement}" a déjà un chef`,
+    );
+  }
 
     departement = foundDepartment;
  
@@ -97,6 +110,11 @@ export class UsersService {
       departement,
     });
     const savedUser = await this.userRepository.save(user);
+    // 2. Mettre à jour le département (côté inverse)
+  departement.chef_departement = savedUser;
+  await this.departmentRepository.save(departement);
+
+  // 6. Recharger l'utilisateur avec sa relation pour le retour
     const result = await this.userRepository.findOne({
       where: { id: savedUser.id },
       relations: {
@@ -107,9 +125,9 @@ export class UsersService {
     throw new Error('Utilisateur introuvable');
   }
 
-    return result;
-
-    
+    // On enlève le password
+  const { password: _, ...userWithoutPassword } = result;
+  return userWithoutPassword as User;
   }
   async save(user: User): Promise<User> {
     return this.userRepository.save(user);
