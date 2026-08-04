@@ -58,80 +58,121 @@ export class UsersService {
 
   return user;
 }
-
-  // async findOne(id: number): Promise<User> {
-  //   return this.findById(id);
-  // }
-
-  async create(email: string, password: string, role: Role, nom: string, telephone: string, departementId: number): Promise<User> {
-    let departement: Departments | undefined = undefined;
-
-    // 1. Récupérer le département
-    const foundDepartment = await this.departmentRepository.findOne({
-      where: { id: departementId },
-      relations: { chef_departement: true,},
-    });
-
-    if (!departementId) {
-      throw new BadRequestException('Un HOD doit obligatoirement avoir un département');
-    }
-
-    if (!foundDepartment) {
-      throw new NotFoundException("Département introuvable");
-    }
-
-    // 2. Vérifier qu'il n'a pas déjà un chef
-  if (foundDepartment.chef_departement) {
-    throw new BadRequestException(
-      `Le département "${foundDepartment.nom_departement}" a déjà un chef`,
-    );
-  }
-
-    departement = foundDepartment;
- 
-    const existing = await this.findByEmail(email);
+   
+  async createAdmin(dto: { email: string, password: string, nom: string, telephone: string, }): Promise<User> {
+    const existing = await this.findByEmail(dto.email);
     if (existing) {
       throw new ConflictException('Cet email est déjà utilisé');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
-    // const departement = departementId
-    // ? await this.departmentRepository.findOne({
-    //     where: { id: departementId },
-    //   })
-    // : undefined;
+    const hashed = await bcrypt.hash(dto.password, 12);
 
     const user = this.userRepository.create({
-      nom,
-      email,
-      password: hashedPassword,
-      telephone,
-      role,
-      departement,
+      email: dto.email!,
+      password: hashed,
+      role: Role.ADMIN,
+      nom: dto.nom!,
+      telephone: dto.telephone!,
     });
-    const savedUser = await this.userRepository.save(user);
-    // 2. Mettre à jour le département (côté inverse)
-  departement.chef_departement = savedUser;
-  await this.departmentRepository.save(departement);
 
-  // 6. Recharger l'utilisateur avec sa relation pour le retour
+    return this.userRepository.save(user);
+  }
+
+  async createUser(dto: CreateUserDto): Promise<User> {
+    const { email, password, nom, telephone } = dto;
+
+    // if (!departement) {
+    //   throw new BadRequestException('Le département est obligatoire pour un employé');
+    // }
+
+    // const foundDepartment = await this.departmentRepository.findOne({
+    //   where: { nom_departement: dto.departement },
+    // });
+
+    // if (!foundDepartment) {
+    //   throw new NotFoundException("Département introuvable");
+    // }
+
+    // // 2. Vérifier qu'il n'a pas déjà un chef
+    // if (dto.role === Role.HOD && foundDepartment.chef_departement) {
+    //   throw new BadRequestException(
+    //     `Le département "${foundDepartment.nom_departement}" a déjà un chef`,
+    //   );
+    // }
+
+    const existing = await this.findByEmail(dto.email!);
+    if (existing) {
+      throw new ConflictException('Cet email est déjà utilisé');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.password!, 12);
+
+    const user = this.userRepository.create({
+      nom: dto.nom,
+      email: dto.email,
+      password: hashedPassword,
+      telephone: dto.telephone,
+      role: Role.EMPLOYEE,
+      // departement: foundDepartment,
+    });
+
+    const savedUser = await this.userRepository.save(user);
+
+    // 6. Recharger l'utilisateur avec sa relation pour le retour
     const result = await this.userRepository.findOne({
       where: { id: savedUser.id },
       relations: {
         departement: true,
       }  
     });
+
     if (!result) {
-    throw new Error('Utilisateur introuvable');
-  }
+      throw new Error('Utilisateur introuvable');
+    }
 
     // On enlève le password
-  const { password: _, ...userWithoutPassword } = result;
-  return userWithoutPassword as User;
-  }
-  async save(user: User): Promise<User> {
-    return this.userRepository.save(user);
-  }
+    const { password: _, ...userWithoutPassword } = result;
+      return userWithoutPassword as User;
+    }
+
+    // if (!dto.departement) {
+    //   throw new BadRequestException('Un HOD doit obligatoirement avoir un département');
+    // }
+
+    // 1. Récupérer le département
+    // const foundDepartment = await this.departmentRepository.findOne({
+    //   where: { nom_departement: dto.departement },
+    //   relations: { chef_departement: true,},
+    // });
+
+    
+    
+    
+
+    
+    
+
+   
+    
+    
+
+    
+    
+    // Si c'est un HOD, mettre à jour le département
+    // if (dto.role === Role.HOD && foundDepartment) {
+    //   foundDepartment.chef_departement = savedUser;
+    //   await this.departmentRepository.save(foundDepartment);
+    // }
+
+    
+
+    
+
+    
+
+    async save(user: User): Promise<User> {
+      return this.userRepository.save(user);
+    }
 
 //   async create(createUserDto: CreateUserDto): Promise<User> {
 //   const queryRunner = this.userRepository.manager.connection.createQueryRunner();
@@ -323,29 +364,29 @@ export class UsersService {
   }
 
 
-  async createUserWithDepartment(createUserDto: CreateUserDto): Promise<User> {
-    const { departement, ...userData } = createUserDto;
+  // async createUserWithDepartment(createUserDto: CreateUserDto): Promise<User> {
+    // const { departement, ...userData } = createUserDto;
 
-    // 1. Vérifier ou créer le département
-    let department = await this.departmentRepository.findOne({
-      where: { nom_departement: departement },
-    });
+    // // 1. Vérifier ou créer le département
+    // let department = await this.departmentRepository.findOne({
+    //   where: { nom_departement: departement },
+    // });
 
-    if (!department) {
-      department = this.departmentRepository.create({ nom_departement: departement });
-      department = await this.departmentRepository.save(department);
-      console.log(`✅ Département créé : ${departement}`);
-    }
+    // if (!department) {
+    //   department = this.departmentRepository.create({ nom_departement: departement });
+    //   department = await this.departmentRepository.save(department);
+    //   console.log(`✅ Département créé : ${departement}`);
+    // }
 
-    // 2. Créer l'utilisateur
-    const user = this.userRepository.create({
-      ...userData,
-      // chef_Departement: department, 
-    });
+  //   // 2. Créer l'utilisateur
+  //   const user = this.userRepository.create({
+  //     ...userData,
+  //     // chef_Departement: department, 
+  //   });
 
-    const savedUser = await this.userRepository.save(user);
+  //   const savedUser = await this.userRepository.save(user);
 
-    return savedUser;
-  }
+  //   return savedUser;
+  // }
   
 }

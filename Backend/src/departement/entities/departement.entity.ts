@@ -11,7 +11,7 @@ export class Departments {
 
     @OneToOne(() => User,{ nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'chefDepartementId' })
-    chef_departement?: User;
+    chef_departement?: User |  null;
 
     @Column({ nullable: true })
     description?: string;

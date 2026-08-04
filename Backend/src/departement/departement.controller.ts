@@ -8,6 +8,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { AssignChefDto } from './dto/assign-chef.dto';
+import { NOMEM } from 'dns';
 
 @Controller('departments')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -32,37 +33,37 @@ export class DepartmentController {
     return this.departmentService.findAll();
   }
 
-  @Get(':id')
+  @Get(':nom_departement')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.HOD, Role.ADMIN)
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.departmentService.findOne(id);
+  @Roles( Role.ADMIN)
+  findOne(@Param('nom_departement') nom_departement: string) {
+    return this.departmentService.findOne(nom_departement);
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('nom_departement') nom_departement: string,
     @Body() updateDepartmentDto: UpdateDepartmentDto,
   ) {
-    return this.departmentService.update(id, updateDepartmentDto);
+    return this.departmentService.update(nom_departement, updateDepartmentDto);
   }
 
   @Patch(':id/chef')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles( Role.ADMIN)
   async assignchefDepartement(
-    @Param('id', ParseIntPipe) departementId: number,
-    @Body() dto: AssignChefDto,
+    @Param('nom_departement') nom_departement: string,
+    @Body('nom') nom: string,
   ) {
-    return this.departmentService.assignChef(departementId, dto);
+    return this.departmentService.assignChef(nom_departement, nom);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.departmentService.remove(id);
+  remove(@Param('nom_departement') nom_departement: string) {
+    return this.departmentService.remove(nom_departement);
   }
 }

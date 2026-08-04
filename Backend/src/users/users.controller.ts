@@ -23,36 +23,29 @@ export class UsersController {
   }
 
   //cree un user
-
   // Seul l'admin peut créer des membres
-  @Post('users')
+  @Post('employee')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async createMember(@Body() dto: RegisterDto) {
-    const user = await this.usersService.create(
-      dto.email!,
-      dto.password!,
-      dto.role!,
-      dto.nom!,
-      dto.telephone!,
-      dto.departementId!,
-    );
+  async createEmployee(@Body() dto: CreateUserDto) {
+    const user = await this.usersService.createUser(dto);
 
-    // On ne renvoie jamais le mot de passe
-    const { password, ...result } = user;
     return {
-      message: 'Membre créé avec succès',
-      user: result,
+      message: 'Employé créé avec succès',
+      user,
     };
   }
+  // @Post('users')
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.ADMIN)
+  // async createUser(@Body() dto: CreateUserDto) {
+  //   const user = await this.usersService.createUser(dto);
 
-  
-  // @Post()
-  // create(@Body() CreateUserDto: CreateUserDto){
-  //  return this.usersService.create(CreateUserDto) 
+  //   return {
+  //     message: `${dto.role} créé avec succès`,
+  //     user,
+  //   };
   // }
-
-  //recuperer tuos les users
 
   @Get('employees')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -68,17 +61,7 @@ export class UsersController {
     return this.usersService.findOne(Number(id));
   }
 
-  //modifier un user
-
-  // @Put(':id')
-  //  async update(
-  //   @Param('id') id: number,
-  //   @Body() updateUserDto: UpdateUserDto,   // ← Ajout important
-    
-  // ) {
-  //   return this.usersService.update(Number(id), updateUserDto);
-  // }
-
+  
   //supprimer un user avec son id
 
   @Delete(':id')
@@ -87,10 +70,6 @@ export class UsersController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
   }
-  // @Delete(':id')
-  // remove(@Param('id') id:number){
-  //   return this.usersService.remove(Number(id));
-  // }
 
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)

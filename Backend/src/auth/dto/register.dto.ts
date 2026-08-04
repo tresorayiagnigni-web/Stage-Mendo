@@ -23,9 +23,9 @@ export class RegisterDto {
     @IsNotEmpty({ message: 'Le rôle est obligatoire' })
     role?: Role;
 
-    @IsOptional()
-    @IsNumber()
-    departementId?: number;
+    // @IsOptional()
+    // @IsNumber()
+    // departementId?: number;
 
     // autres champs...
 }

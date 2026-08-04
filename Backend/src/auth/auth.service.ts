@@ -5,13 +5,13 @@ import { JwtService } from '@nestjs/jwt';
 // import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User} from '../users/entities/user.entity';
-import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { TokenService } from './token.service';  // ← Ajouté 
 import { UsersService } from 'src/users/users.service';
 import { Role } from './enums/role.enum';
+import { RegisterDto } from './dto/register.dto';
 
 
 
@@ -36,19 +36,17 @@ export class AuthService {
       );
     }
 
-    // Premier utilisateur = admin
-    const user = await this.usersService.create(
-      dto.email!,
-      dto.password!,
-      Role.ADMIN,
-      dto.nom!,
-      dto.telephone!,
-      dto.departementId!,
-
+    // Premier utilisateur = admin sans besoin de département
+    const user = await this.usersService.createAdmin(
+      {
+        email: dto.email!,
+        password: dto.password!,
+        nom: dto.nom!,
+        telephone: dto.telephone!,
+      }
     );
 
     const token = this.generateToken(user);
-
     const { password, ...result } = user;
     return {
       message: 'Compte administrateur créé avec succès',

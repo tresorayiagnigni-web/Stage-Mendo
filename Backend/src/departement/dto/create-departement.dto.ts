@@ -7,7 +7,7 @@ export class CreateDepartmentDto {
 
     @IsString()
     @IsOptional()
-    chef_depatement?: string;
+    chef_departement?: string;
 
     @IsString()
     @IsOptional()
